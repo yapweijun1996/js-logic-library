@@ -15,13 +15,13 @@ A library of small, pure, dependency-free JavaScript (ES modules) logic files. E
 ## Layout
 - `src/*.js` — one module per file; pure functions only.
 - `tests/<name>.test.mjs` — one test file per module; doubles as a usage example. Runner: `node --test`.
-- `docs/MODULES.md` — human-readable module table (keep in sync when adding a module).
+- `docs/MODULES.md` — module table, generated.
 - `site/` — the explorer UI (`index.html`, `app.js`, `style.css`) and generated `modules.json`, `llms.txt`.
 - `scripts/build-index.mjs` — regenerates `site/modules.json` and `site/llms.txt` from `src/` and `tests/`. Never edit those two files by hand.
 - `scripts/serve.mjs` — local static server for the explorer.
 
 ## Commands
-- `npm test` — run all module tests.
+- `npm test` — fail if generated files are stale, then run all module tests.
 - `npm run build` — regenerate the index.
 - `npm run dev` — build, then serve the explorer at http://127.0.0.1:5300/.
 
@@ -31,7 +31,7 @@ A library of small, pure, dependency-free JavaScript (ES modules) logic files. E
 3. The first comment lines of the file are its documentation and its Input/Output contract: line 1 is a one-line purpose; following lines state `Input:`, `Output:`, units, coordinate system and edge cases. The index builder reads these.
 4. Export named functions/constants only.
 5. Add `tests/<name>.test.mjs` covering normal cases and boundaries (zero, exact thresholds, float noise).
-6. Add one row to `docs/MODULES.md`, run `npm run build`, run `npm test`.
+6. Run `npm run build`, then `npm test`. Do not hand-edit `docs/MODULES.md`, `site/modules.json` or `site/llms.txt`; they are generated.
 
 ## Do not
 - Add npm dependencies or a bundler.
@@ -44,3 +44,6 @@ A library of small, pure, dependency-free JavaScript (ES modules) logic files. E
 
 ## Status of the design goals
 Discoverable, understandable (prose contract), reusable by copy and testable are in place. Not built yet: automatic copying of dependencies, per-module version or change detection, and verification outside Node. Do not claim these exist.
+
+## One source, no separate human and agent versions
+Code, documentation (the header comment) and tests live once, in `src/` and `tests/`. The explorer, `docs/MODULES.md`, `site/llms.txt` and `site/modules.json` are all generated from them, and `npm test` fails if any is out of date. Humans and agents read the same files.
