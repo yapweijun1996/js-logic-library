@@ -9,18 +9,143 @@
       "version": "1.0.0",
       "provenance": "Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).",
       "license": "Apache-2.0",
-      "notes": "Units: pointer positions and distance share one unit (pixels); ratios are 0..1.\nInput: pointer start/current positions and track length (numbers); a ratio (number).\nOutput: pullRatio and shotStrength return 0..1; reachesMinPull returns a boolean.",
+      "status": "stable",
+      "hash": "b2083cfbb625",
+      "notes": "Units: pointer positions and distance share one unit (pixels); ratios are 0..1.",
       "exports": [
         "PULL",
         "pullRatio",
         "shotStrength",
         "reachesMinPull"
       ],
+      "examples": [
+        {
+          "path": "examples/node/pull-gesture.mjs",
+          "source": "// Runnable example: node examples/node/pull-gesture.mjs\nimport assert from \"node:assert/strict\";\nimport { pullRatio, shotStrength, reachesMinPull } from \"../../modules/interaction/pull-gesture.js\";\n\nconst ratio = pullRatio(100, 150, 100); // dragged 50px along a 100px track\nassert.equal(ratio, 0.5);\nassert.equal(reachesMinPull(ratio), true);\nconsole.log(`ratio ${ratio} -> strength ${shotStrength(ratio).toFixed(3)}`);\n"
+        }
+      ],
+      "functions": [
+        {
+          "name": "pullRatio",
+          "description": "How far a drag has travelled along a track, clamped to 0..1.",
+          "params": [
+            {
+              "name": "start",
+              "type": "number",
+              "optional": false,
+              "description": "Pointer position where the drag began."
+            },
+            {
+              "name": "current",
+              "type": "number",
+              "optional": false,
+              "description": "Current pointer position."
+            },
+            {
+              "name": "distance",
+              "type": "number",
+              "optional": false,
+              "description": "Track length in the same unit as the positions."
+            }
+          ],
+          "returns": {
+            "type": "number",
+            "description": "Pull ratio in 0..1."
+          },
+          "throws": [],
+          "edge": [
+            "A track length of 0 or less returns 0.",
+            "Dragging backwards (current < start) returns 0."
+          ],
+          "examples": [
+            "pullRatio(100, 150, 100) // => 0.5",
+            "pullRatio(100, 50, 100) // => 0"
+          ],
+          "signature": "pullRatio(start, current, distance)",
+          "paramNames": [
+            "start",
+            "current",
+            "distance"
+          ]
+        },
+        {
+          "name": "shotStrength",
+          "description": "Power curve: gentle pulls stay gentle, full pulls reach 1.",
+          "params": [
+            {
+              "name": "ratio",
+              "type": "number",
+              "optional": false,
+              "description": "Pull ratio; values outside 0..1 are clamped."
+            }
+          ],
+          "returns": {
+            "type": "number",
+            "description": "Shot strength in 0..1."
+          },
+          "throws": [],
+          "edge": [],
+          "examples": [
+            "shotStrength(1) // => 1",
+            "shotStrength(0) // => 0"
+          ],
+          "signature": "shotStrength(ratio)",
+          "paramNames": [
+            "ratio"
+          ]
+        },
+        {
+          "name": "reachesMinPull",
+          "description": "True when a released pull is long enough to shoot. Tolerates 1e-9 of float noise: an exact 5% pull computed from pixel coordinates can land at 0.04999999.",
+          "params": [
+            {
+              "name": "ratio",
+              "type": "number",
+              "optional": false,
+              "description": "Pull ratio at release."
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "optional": true,
+              "description": "Minimum ratio that still shoots."
+            }
+          ],
+          "returns": {
+            "type": "boolean",
+            "description": "Whether the pull reaches the minimum."
+          },
+          "throws": [],
+          "edge": [
+            "Exactly the minimum shoots; anything clearly below does not."
+          ],
+          "examples": [
+            "reachesMinPull(0.05) // => true",
+            "reachesMinPull(0.049) // => false"
+          ],
+          "signature": "reachesMinPull(ratio, min = PULL.min)",
+          "paramNames": [
+            "ratio",
+            "min"
+          ]
+        }
+      ],
+      "constants": [
+        {
+          "name": "PULL",
+          "description": " Gesture thresholds: minimum pull ratio to shoot (0.05) and the power-curve exponent (1.5). ",
+          "params": [],
+          "returns": null,
+          "throws": [],
+          "edge": [],
+          "examples": []
+        }
+      ],
       "dependencies": [
         "math/clamp"
       ],
       "external": [],
-      "source": "// Pull-to-shoot gesture math. Pure functions: no DOM, no globals.\n// Units: pointer positions and distance share one unit (pixels); ratios are 0..1.\n// Input: pointer start/current positions and track length (numbers); a ratio (number).\n// Output: pullRatio and shotStrength return 0..1; reachesMinPull returns a boolean.\n// Version: 1.0.0\n// Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).\n// License: Apache-2.0\n\nimport { clamp } from \"../math/clamp.js\";\n\nexport const PULL = Object.freeze({ min: 0.05, curve: 1.5 });\n\n// How far a drag has travelled along a track, clamped to 0..1.\nexport const pullRatio = (start, current, distance) =>\n  distance > 0 ? clamp((current - start) / distance, 0, 1) : 0;\n\n// Power curve: gentle pulls stay gentle, full pulls reach 1.\nexport const shotStrength = (ratio) => clamp(ratio, 0, 1) ** PULL.curve;\n\n// True when a released pull is long enough to shoot. The tolerance absorbs float\n// noise: an exact 5% pull computed from pixel coordinates can land at 0.04999999.\nexport const reachesMinPull = (ratio, min = PULL.min) => ratio >= min - 1e-9;\n",
+      "source": "// Pull-to-shoot gesture math. Pure functions: no DOM, no globals.\n// Units: pointer positions and distance share one unit (pixels); ratios are 0..1.\n// Version: 1.0.0\n// Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).\n// License: Apache-2.0\n\nimport { clamp } from \"../math/clamp.js\";\n\n/** Gesture thresholds: minimum pull ratio to shoot (0.05) and the power-curve exponent (1.5). */\nexport const PULL = Object.freeze({ min: 0.05, curve: 1.5 });\n\n/**\n * How far a drag has travelled along a track, clamped to 0..1.\n * @param {number} start - Pointer position where the drag began.\n * @param {number} current - Current pointer position.\n * @param {number} distance - Track length in the same unit as the positions.\n * @returns {number} Pull ratio in 0..1.\n * @edge A track length of 0 or less returns 0.\n * @edge Dragging backwards (current < start) returns 0.\n * @example pullRatio(100, 150, 100) // => 0.5\n * @example pullRatio(100, 50, 100) // => 0\n */\nexport const pullRatio = (start, current, distance) =>\n  distance > 0 ? clamp((current - start) / distance, 0, 1) : 0;\n\n/**\n * Power curve: gentle pulls stay gentle, full pulls reach 1.\n * @param {number} ratio - Pull ratio; values outside 0..1 are clamped.\n * @returns {number} Shot strength in 0..1.\n * @example shotStrength(1) // => 1\n * @example shotStrength(0) // => 0\n */\nexport const shotStrength = (ratio) => clamp(ratio, 0, 1) ** PULL.curve;\n\n/**\n * True when a released pull is long enough to shoot. Tolerates 1e-9 of float noise:\n * an exact 5% pull computed from pixel coordinates can land at 0.04999999.\n * @param {number} ratio - Pull ratio at release.\n * @param {number} [min=0.05] - Minimum ratio that still shoots.\n * @returns {boolean} Whether the pull reaches the minimum.\n * @edge Exactly the minimum shoots; anything clearly below does not.\n * @example reachesMinPull(0.05) // => true\n * @example reachesMinPull(0.049) // => false\n */\nexport const reachesMinPull = (ratio, min = PULL.min) => ratio >= min - 1e-9;\n",
       "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { pullRatio, shotStrength, reachesMinPull } from \"./pull-gesture.js\";\n\ntest(\"pullRatio clamps to 0..1 and handles a zero-length track\", () => {\n  assert.equal(pullRatio(100, 150, 100), 0.5);\n  assert.equal(pullRatio(100, 50, 100), 0);\n  assert.equal(pullRatio(100, 900, 100), 1);\n  assert.equal(pullRatio(100, 150, 0), 0);\n});\ntest(\"shotStrength is monotonic and reaches 1\", () => {\n  assert.equal(shotStrength(0), 0);\n  assert.equal(shotStrength(1), 1);\n  assert.ok(shotStrength(0.5) < 0.5);\n});\ntest(\"reachesMinPull accepts exact 5% despite float noise, rejects less\", () => {\n  assert.equal(reachesMinPull(0.05), true);\n  assert.equal(reachesMinPull(0.05 - 1e-12), true);\n  assert.equal(reachesMinPull(0.049), false);\n  assert.equal(reachesMinPull(0), false);\n  for (let d = 100; d < 600; d++) assert.equal(reachesMinPull(((123.5 + d * 0.05) - 123.5) / d), true);\n});\n"
     },
     {
@@ -32,13 +157,63 @@
       "version": "1.0.0",
       "provenance": "written for js-logic-library.",
       "license": "Apache-2.0",
-      "notes": "Input: value, min, max (numbers, min <= max).\nOutput: value limited to min..max; NaN in gives NaN out.",
+      "status": "stable",
+      "hash": "09845dd8d218",
+      "notes": "",
       "exports": [
         "clamp"
       ],
+      "examples": [],
+      "functions": [
+        {
+          "name": "clamp",
+          "description": "Limit a number to the inclusive range min..max.",
+          "params": [
+            {
+              "name": "value",
+              "type": "number",
+              "optional": false,
+              "description": "The input value."
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "optional": false,
+              "description": "Lower bound (inclusive)."
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "optional": false,
+              "description": "Upper bound (inclusive); expected min <= max."
+            }
+          ],
+          "returns": {
+            "type": "number",
+            "description": "value limited to min..max."
+          },
+          "throws": [],
+          "edge": [
+            "If value < min, returns min.",
+            "If value > max, returns max.",
+            "NaN in gives NaN out; arguments are not validated."
+          ],
+          "examples": [
+            "clamp(1.5, 0, 1) // => 1",
+            "clamp(0.25, 0, 1) // => 0.25"
+          ],
+          "signature": "clamp(value, min, max)",
+          "paramNames": [
+            "value",
+            "min",
+            "max"
+          ]
+        }
+      ],
+      "constants": [],
       "dependencies": [],
       "external": [],
-      "source": "// Clamp a number into the range min..max.\n// Input: value, min, max (numbers, min <= max).\n// Output: value limited to min..max; NaN in gives NaN out.\n// Version: 1.0.0\n// Source: written for js-logic-library.\n// License: Apache-2.0\n\nexport const clamp = (value, min, max) => Math.min(max, Math.max(min, value));\n",
+      "source": "// Clamp a number into the range min..max.\n// Version: 1.0.0\n// Source: written for js-logic-library.\n// License: Apache-2.0\n\n/**\n * Limit a number to the inclusive range min..max.\n * @param {number} value - The input value.\n * @param {number} min - Lower bound (inclusive).\n * @param {number} max - Upper bound (inclusive); expected min <= max.\n * @returns {number} value limited to min..max.\n * @edge If value < min, returns min.\n * @edge If value > max, returns max.\n * @edge NaN in gives NaN out; arguments are not validated.\n * @example clamp(1.5, 0, 1) // => 1\n * @example clamp(0.25, 0, 1) // => 0.25\n */\nexport const clamp = (value, min, max) => Math.min(max, Math.max(min, value));\n",
       "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { clamp } from \"./clamp.js\";\n\ntest(\"clamp limits to the range and keeps in-range values\", () => {\n  assert.equal(clamp(1.5, 0, 1), 1);\n  assert.equal(clamp(-2, 0, 1), 0);\n  assert.equal(clamp(0.25, 0, 1), 0.25);\n  assert.equal(clamp(0, 0, 1), 0);\n  assert.equal(clamp(1, 0, 1), 1);\n});\n"
     }
   ]
