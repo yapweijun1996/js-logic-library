@@ -8,6 +8,7 @@ for (const m of modules) {
   if (!m.summary) errors.push(`${m.id}: first header line must be a one-line purpose`);
   if (!/^\d+\.\d+\.\d+$/.test(m.version)) errors.push(`${m.id}: header needs "Version: x.y.z"`);
   if (!m.provenance) errors.push(`${m.id}: header needs "Source: ..." (provenance)`);
+  if (m.license !== "Apache-2.0") errors.push(`${m.id}: header needs "License: Apache-2.0"`);
   if (!m.testPath) errors.push(`${m.id}: missing ${m.path.replace(/\.js$/, ".test.js")}`);
   if (!m.exports.length) errors.push(`${m.id}: no named exports`);
   if (m.external.length) errors.push(`${m.id}: imports outside the library (${m.external.join(", ")}); declare it deliberately before allowing`);

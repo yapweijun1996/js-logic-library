@@ -11,5 +11,6 @@
     "verify": "node scripts/verify-modules.js",
     "test": "node scripts/build-index.js --check && node scripts/verify-modules.js && node --test \"modules/**/*.test.js\"",
     "dev": "node scripts/build-index.js && node scripts/serve.mjs"
-  }
+  },
+  "license": "Apache-2.0"
 }

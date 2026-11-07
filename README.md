@@ -29,9 +29,9 @@ MODULES.md, site/*                   generated from modules/, never hand-edited
 - **Copy or import.** No npm package yet; publish only when there is a need.
 - **Versioned contracts.** Every module has a `Version:`; `CHANGELOG.md` records changes and breaking changes.
 - **Executable examples.** Examples in `examples/` run as part of `npm test`.
-- **Provenance.** Every module states its `Source:`.
+- **Provenance and license.** Every module states its `Source:` and `License: Apache-2.0` in its own header, so a single copied file stays legally clear. Apache-2.0 requires keeping the license notice when redistributing; the header line and `LICENSE` serve that purpose.
 
 ## Status
-Done: explorer, generated indexes, dependency-aware copy, contract check, runnable Node example. Not done: React and vanilla-JS examples, a license (owner decision, see below), automatic breaking-change detection, browser verification.
+Done: explorer, generated indexes, dependency-aware copy, contract check, runnable Node example. Not done: React and vanilla-JS examples, automatic breaking-change detection, browser verification.
 
-**License: undecided.** No license file exists yet, so others have no legal right to reuse this code. Choose one (for example MIT) before publishing.
+**License:** Apache-2.0 (see `LICENSE`).

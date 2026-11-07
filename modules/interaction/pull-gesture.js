@@ -4,6 +4,7 @@
 // Output: pullRatio and shotStrength return 0..1; reachesMinPull returns a boolean.
 // Version: 1.0.0
 // Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).
+// License: Apache-2.0
 
 import { clamp } from "../math/clamp.js";
 

@@ -16,7 +16,7 @@ Reuse existing logic instead of redesigning it. Same files serve humans and agen
 
 ## New module rules
 1. Path `modules/<category>/<name>.js` with `modules/<category>/<name>.test.js` beside it.
-2. Header comment lines: purpose; Input/Output contract, units, edge cases; `Version: x.y.z`; `Source: ...`.
+2. Header comment lines: purpose; Input/Output contract, units, edge cases; `Version: x.y.z`; `Source: ...`; `License: Apache-2.0`. Keep the license line when copying a module.
 3. Named exports only; pure functions; time, randomness and state come in as arguments.
 4. Depend only on other library modules, via relative imports (that is the declaration).
 5. Tests cover normal cases and boundaries (zero, exact thresholds, float noise).

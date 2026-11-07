@@ -38,8 +38,8 @@ export async function readModules() {
     }
     modules.push({
       id, category: id.split("/")[0], path, testPath: test ? testPath : null,
-      summary: header[0] ?? "", version: field("Version"), provenance: field("Source"),
-      notes: header.slice(1).filter((l) => !/^(Version|Source): /.test(l)).join("\n"),
+      summary: header[0] ?? "", version: field("Version"), provenance: field("Source"), license: field("License"),
+      notes: header.slice(1).filter((l) => !/^(Version|Source|License): /.test(l)).join("\n"),
       exports: [...source.matchAll(/^export (?:const|function) (\w+)/gm)].map((m) => m[1]),
       dependencies, external, source, test,
     });
