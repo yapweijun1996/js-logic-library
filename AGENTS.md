@@ -1,49 +1,28 @@
 # AGENTS.md — js-logic-library
 
-Read this first if you are an AI agent. Goal: reuse existing logic instead of redesigning it.
+Reuse existing logic instead of redesigning it. Same files serve humans and agents; there is no agent-only copy.
 
-## What this repo is
-A library of small, pure, dependency-free JavaScript (ES modules) logic files. Each file in `src/` is designed to be copied alone into another project. There is no framework and no package to install.
-
-## How to use it (do this, in order)
-1. Read `docs/MODULES.md` (human table) or `site/llms.txt` (one line per module: purpose, exports, dependencies, path). Full source of every module is in `site/modules.json`.
-2. Pick the module whose purpose matches your need. If one matches, use it as-is. Do not rewrite or "improve" it.
-3. Copy `src/<name>.js` and `tests/<name>.test.mjs` into the target project. Keep the header comment (it states units and coordinate systems).
-4. Run the copied test (`node --test`). It must pass in the new project before you build on it.
-5. If nothing fits, add a new module here following the rules below, then copy it.
-
-## Layout
-- `src/*.js` — one module per file; pure functions only.
-- `tests/<name>.test.mjs` — one test file per module; doubles as a usage example. Runner: `node --test`.
-- `docs/MODULES.md` — module table, generated.
-- `site/` — the explorer UI (`index.html`, `app.js`, `style.css`) and generated `modules.json`, `llms.txt`.
-- `scripts/build-index.mjs` — regenerates `site/modules.json` and `site/llms.txt` from `src/` and `tests/`. Never edit those two files by hand.
-- `scripts/serve.mjs` — local static server for the explorer.
+## Use
+1. Read `MODULES.md` (or `site/llms.txt`; full source in `site/modules.json`).
+2. If a module matches, use it as-is. Do not rewrite or "improve" it.
+3. `npm run copy -- <module-id> <dest-dir>` copies the module, its test and all dependencies, keeping relative layout. Example id: `interaction/pull-gesture`.
+4. Run the copied tests in the destination. They must pass before you build on it.
+5. Nothing fits? Add a module here (rules below), then copy it.
 
 ## Commands
-- `npm test` — fail if generated files are stale, then run all module tests.
-- `npm run build` — regenerate the index.
-- `npm run dev` — build, then serve the explorer at http://127.0.0.1:5300/.
+- `npm test` — checks generated files are fresh, verifies every module's contract, runs examples, runs unit tests.
+- `npm run build` — regenerate `MODULES.md` and `site/*`.
+- `npm run dev` — build and serve the explorer at http://127.0.0.1:5300/.
 
-## Rules for a new module
-1. Pure functions: no DOM, no `window`, no `Date.now()` or randomness inside; pass time, config and randomness as arguments.
-2. No dependencies. Imports of sibling modules are allowed only if listed in the header.
-3. The first comment lines of the file are its documentation and its Input/Output contract: line 1 is a one-line purpose; following lines state `Input:`, `Output:`, units, coordinate system and edge cases. The index builder reads these.
-4. Export named functions/constants only.
-5. Add `tests/<name>.test.mjs` covering normal cases and boundaries (zero, exact thresholds, float noise).
-6. Run `npm run build`, then `npm test`. Do not hand-edit `docs/MODULES.md`, `site/modules.json` or `site/llms.txt`; they are generated.
+## New module rules
+1. Path `modules/<category>/<name>.js` with `modules/<category>/<name>.test.js` beside it.
+2. Header comment lines: purpose; Input/Output contract, units, edge cases; `Version: x.y.z`; `Source: ...`.
+3. Named exports only; pure functions; time, randomness and state come in as arguments.
+4. Depend only on other library modules, via relative imports (that is the declaration).
+5. Tests cover normal cases and boundaries (zero, exact thresholds, float noise).
+6. Add an entry to `CHANGELOG.md`; bump `Version:` on any behaviour or API change, major on breaking change.
+7. Run `npm run build` then `npm test`. Never hand-edit `MODULES.md` or `site/modules.json`/`llms.txt`.
 
 ## Do not
-- Add npm dependencies or a bundler.
-- Put UI or browser code in `src/`.
-- Duplicate an existing module under another name.
-- Push or open PRs unless the owner asks.
-
-## Provenance
-`pull-gesture` came from the Blender-3D-Gallery Eight-Ball game (`src/game/interaction.js`). The 1e-9 tolerance in `reachesMinPull` exists because an exact 5% pull computed from pixel coordinates can land at 0.04999999 and wrongly cancel the shot.
-
-## Status of the design goals
-Discoverable, understandable (prose contract), reusable by copy and testable are in place. Not built yet: automatic copying of dependencies, per-module version or change detection, and verification outside Node. Do not claim these exist.
-
-## One source, no separate human and agent versions
-Code, documentation (the header comment) and tests live once, in `src/` and `tests/`. The explorer, `docs/MODULES.md`, `site/llms.txt` and `site/modules.json` are all generated from them, and `npm test` fails if any is out of date. Humans and agents read the same files.
+- Add npm dependencies or a bundler; put UI/browser code in `modules/`; duplicate a module under another name; push or open PRs unless the owner asks.
+- Claim features that are not built (see Status in `README.md`).

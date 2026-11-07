@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { pullRatio, shotStrength, reachesMinPull } from "../src/pull-gesture.js";
+import { pullRatio, shotStrength, reachesMinPull } from "./pull-gesture.js";
 
 test("pullRatio clamps to 0..1 and handles a zero-length track", () => {
   assert.equal(pullRatio(100, 150, 100), 0.5);

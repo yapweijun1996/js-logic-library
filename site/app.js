@@ -31,9 +31,16 @@ function renderList() {
   if (!shown.length) $("#list").append(el("li", { className: "empty" }, "No match. Try a function name."));
 }
 
+function withDeps(m, seen = new Set()) {
+  if (seen.has(m.id)) return [];
+  seen.add(m.id);
+  return [...m.dependencies.flatMap((d) => withDeps(modules.find((x) => x.id === d), seen)), m];
+}
 function agentPrompt(m) {
-  return `Use the module below as-is; do not redesign it. Copy ${m.path}${m.testPath ? ` and ${m.testPath}` : ""} into the project, keep the header comment, run the test, then call it.\n` +
-    `Exports: ${m.exports.join(", ")}\nDependencies: ${m.dependencies.join(", ") || "none"}\n\n--- ${m.path} ---\n${m.source}`;
+  const set = withDeps(m);
+  return `Use these modules as-is; do not redesign them. Copy each file (keep the relative layout and header comments) with its test, run the tests, then call ${m.id}.\n` +
+    `Exports: ${m.exports.join(", ")}\nVersion: ${m.version}\n\n` +
+    set.map((x) => `--- ${x.path} ---\n${x.source}\n--- ${x.testPath ?? "no test"} ---\n${x.test}`).join("\n");
 }
 
 function select(id) {
@@ -58,11 +65,11 @@ function renderDetail() {
     el("h1", {}, m.id),
     el("p", { className: "summary" }, m.summary),
     el("ul", { className: "chips", ariaLabel: "Exports" }, ...m.exports.map((x) => el("li", {}, x))),
-    el("p", { className: "meta" }, `Dependencies: ${m.dependencies.join(", ") || "none"} · ${m.source.split("\n").length} lines`),
+    el("p", { className: "meta" }, `v${m.version} · Dependencies: ${m.dependencies.join(", ") || "none"} · Source: ${m.provenance} · ${m.source.split("\n").length} lines`),
     ...(m.notes ? [el("p", { className: "notes" }, m.notes)] : []),
     el("div", { className: "actions" },
       el("button", { type: "button", className: "act primary", onclick: () => copy(m.source, m.path) }, "Copy file"),
-      el("button", { type: "button", className: "act", onclick: () => copy(m.source + "\n\n" + m.test, "file + test") }, "Copy file + test"),
+      el("button", { type: "button", className: "act", onclick: () => copy(withDeps(m).map((x) => x.source + "\n\n" + x.test).join("\n\n"), "file + test + dependencies") }, "Copy with dependencies + tests"),
       el("button", { type: "button", className: "act", onclick: () => copy(agentPrompt(m), "agent prompt") }, "Copy for AI agent")),
     tabs, code);
   draw();

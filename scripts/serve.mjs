@@ -10,7 +10,7 @@ createServer(async (req, res) => {
   const file = join("site", path.endsWith("/") ? path + "index.html" : path);
   try {
     const body = await readFile(file);
-    res.writeHead(200, { "content-type": `${types[extname(file)] ?? "text/plain"}; charset=utf-8` });
+    res.writeHead(200, { "cache-control": "no-cache", "content-type": `${types[extname(file)] ?? "text/plain"}; charset=utf-8` });
     res.end(body);
   } catch { res.writeHead(404).end("not found"); }
 }).listen(port, "127.0.0.1", () => console.log(`http://127.0.0.1:${port}/`));

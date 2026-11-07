@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "description": "Small pure-function JS modules an AI agent can copy one file at a time.",
+  "description": "Universal JavaScript logic library: pure functions, one source, tests included.",
   "scripts": {
-    "test": "node scripts/build-index.mjs --check && node --test tests/*.test.mjs",
-    "build": "node scripts/build-index.mjs",
-    "dev": "node scripts/build-index.mjs && node scripts/serve.mjs",
-    "check": "node scripts/build-index.mjs --check"
+    "build": "node scripts/build-index.js",
+    "check": "node scripts/build-index.js --check",
+    "copy": "node scripts/copy-module.js",
+    "verify": "node scripts/verify-modules.js",
+    "test": "node scripts/build-index.js --check && node scripts/verify-modules.js && node --test \"modules/**/*.test.js\"",
+    "dev": "node scripts/build-index.js && node scripts/serve.mjs"
   }
 }

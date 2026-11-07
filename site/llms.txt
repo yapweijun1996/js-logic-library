@@ -1,5 +1,6 @@
 # js-logic-library
-Pure, dependency-free JS modules. Copy one file from src/ (plus its test) and use it; do not redesign.
-Machine-readable index with full source: modules.json
+Universal JavaScript logic: pure functions, one source, tests included. Copy a module with its dependencies and use it; do not redesign.
+Full source of every module: modules.json. Copy with dependencies: npm run copy -- <id> <dir>
 
-- pull-gesture: Pull-to-shoot gesture math. Pure functions: no DOM, no globals, no dependencies. | exports: PULL, pullRatio, shotStrength, reachesMinPull | deps: none | file: src/pull-gesture.js
+- interaction/pull-gesture v1.0.0: Pull-to-shoot gesture math. Pure functions: no DOM, no globals. | exports: PULL, pullRatio, shotStrength, reachesMinPull | deps: math/clamp | file: modules/interaction/pull-gesture.js
+- math/clamp v1.0.0: Clamp a number into the range min..max. | exports: clamp | deps: none | file: modules/math/clamp.js
