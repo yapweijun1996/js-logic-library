@@ -1,0 +1,5 @@
+# js-logic-library
+Pure, dependency-free JS modules. Copy one file from src/ (plus its test) and use it; do not redesign.
+Machine-readable index with full source: modules.json
+
+- pull-gesture: Pull-to-shoot gesture math. Pure functions: no DOM, no globals, no dependencies. | exports: PULL, pullRatio, shotStrength, reachesMinPull | deps: none | file: src/pull-gesture.js

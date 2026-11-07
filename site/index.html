@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>js-logic-library</title>
+<meta name="description" content="Pure, dependency-free JS modules to copy one file at a time.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="./">js-logic-library</a>
+  <input id="q" type="search" placeholder="Search modules or functions   ( / )" aria-label="Search modules or functions" autocomplete="off">
+  <nav class="agent-links" aria-label="For AI agents">
+    <a href="llms.txt">llms.txt</a><a href="modules.json">modules.json</a>
+  </nav>
+</header>
+<div class="layout">
+  <aside class="side" aria-label="Modules">
+    <p class="count" id="count" role="status"></p>
+    <ul id="list" class="list"></ul>
+  </aside>
+  <main id="detail" class="detail" tabindex="-1">
+    <p class="empty">Loading modules…</p>
+  </main>
+</div>
+<script src="app.js" type="module"></script>
+</body>
+</html>

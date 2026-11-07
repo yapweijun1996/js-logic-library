@@ -11,3 +11,6 @@ Copy one file from `src/` (and its test from `tests/`) into your project. Every 
 2. Header comment states purpose, units and coordinate system.
 3. One test file per module that doubles as a usage example.
 4. Add one row to the table above.
+
+## Explorer
+`npm run dev` serves a browsable page at http://127.0.0.1:5300/ (search, copy file, copy file + test, copy a ready-made prompt for an AI agent). Agents should read `site/llms.txt` or `site/modules.json` instead. See `AGENTS.md`.

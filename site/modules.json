@@ -1,0 +1,21 @@
+{
+  "generated": "2026-11-07T01:42:47.577Z",
+  "modules": [
+    {
+      "id": "pull-gesture",
+      "path": "src/pull-gesture.js",
+      "testPath": "tests/pull-gesture.test.mjs",
+      "summary": "Pull-to-shoot gesture math. Pure functions: no DOM, no globals, no dependencies.",
+      "notes": "Units: pointer positions and distance share one unit (pixels); ratios are 0..1.",
+      "exports": [
+        "PULL",
+        "pullRatio",
+        "shotStrength",
+        "reachesMinPull"
+      ],
+      "dependencies": [],
+      "source": "// Pull-to-shoot gesture math. Pure functions: no DOM, no globals, no dependencies.\n// Units: pointer positions and distance share one unit (pixels); ratios are 0..1.\n\nexport const PULL = Object.freeze({ min: 0.05, curve: 1.5 });\n\n// How far a drag has travelled along a track, clamped to 0..1.\nexport const pullRatio = (start, current, distance) =>\n  distance > 0 ? Math.min(1, Math.max(0, (current - start) / distance)) : 0;\n\n// Power curve: gentle pulls stay gentle, full pulls reach 1.\nexport const shotStrength = (ratio) => Math.max(0, Math.min(1, ratio)) ** PULL.curve;\n\n// True when a released pull is long enough to shoot. The tolerance absorbs float\n// noise: an exact 5% pull computed from pixel coordinates can land at 0.04999999.\nexport const reachesMinPull = (ratio, min = PULL.min) => ratio >= min - 1e-9;\n",
+      "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { pullRatio, shotStrength, reachesMinPull } from \"../src/pull-gesture.js\";\n\ntest(\"pullRatio clamps to 0..1 and handles a zero-length track\", () => {\n  assert.equal(pullRatio(100, 150, 100), 0.5);\n  assert.equal(pullRatio(100, 50, 100), 0);\n  assert.equal(pullRatio(100, 900, 100), 1);\n  assert.equal(pullRatio(100, 150, 0), 0);\n});\ntest(\"shotStrength is monotonic and reaches 1\", () => {\n  assert.equal(shotStrength(0), 0);\n  assert.equal(shotStrength(1), 1);\n  assert.ok(shotStrength(0.5) < 0.5);\n});\ntest(\"reachesMinPull accepts exact 5% despite float noise, rejects less\", () => {\n  assert.equal(reachesMinPull(0.05), true);\n  assert.equal(reachesMinPull(0.05 - 1e-12), true);\n  assert.equal(reachesMinPull(0.049), false);\n  assert.equal(reachesMinPull(0), false);\n  for (let d = 100; d < 600; d++) assert.equal(reachesMinPull(((123.5 + d * 0.05) - 123.5) / d), true);\n});\n"
+    }
+  ]
+}
