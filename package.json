@@ -1,0 +1,8 @@
+{
+  "name": "js-logic-library",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Small pure-function JS modules an AI agent can copy one file at a time.",
+  "scripts": { "test": "node --test tests/*.test.mjs" }
+}
