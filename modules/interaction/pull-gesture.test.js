@@ -13,10 +13,13 @@ test("shotStrength is monotonic and reaches 1", () => {
   assert.equal(shotStrength(1), 1);
   assert.ok(shotStrength(0.5) < 0.5);
 });
-test("reachesMinPull accepts exact 5% despite float noise, rejects less", () => {
+test("reachesMinPull accepts an exact 5% despite float32 pointer coordinates, rejects weak pulls", () => {
   assert.equal(reachesMinPull(0.05), true);
-  assert.equal(reachesMinPull(0.05 - 1e-12), true);
+  // Real pointer data that broke the game's CI: float32 coordinate, 381px track.
+  const actual = pullRatio(313, 332.04998779296875, 381);
+  assert.ok(actual < 0.05);
+  assert.equal(reachesMinPull(actual), true);
   assert.equal(reachesMinPull(0.049), false);
+  assert.equal(reachesMinPull(0.04), false);
   assert.equal(reachesMinPull(0), false);
-  for (let d = 100; d < 600; d++) assert.equal(reachesMinPull(((123.5 + d * 0.05) - 123.5) / d), true);
 });

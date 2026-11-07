@@ -1,16 +1,223 @@
 {
   "modules": [
     {
+      "id": "interaction/aim",
+      "category": "interaction",
+      "path": "modules/interaction/aim.js",
+      "testPath": "modules/interaction/aim.test.js",
+      "summary": "Aim angles for a cue ball on a table plane (x along the table, z across; angles in radians, atan2 convention).",
+      "version": "1.0.0",
+      "provenance": "Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).",
+      "license": "Apache-2.0",
+      "status": "stable",
+      "hash": "b204623b1b59",
+      "notes": "",
+      "exports": [
+        "aimAngle",
+        "dragAngle"
+      ],
+      "examples": [],
+      "functions": [
+        {
+          "name": "aimAngle",
+          "description": "Aim from the cue ball toward the pointer (dragging on the felt).",
+          "params": [
+            {
+              "name": "cue",
+              "type": "{x: number, z: number}",
+              "optional": false,
+              "description": "Cue ball centre."
+            },
+            {
+              "name": "point",
+              "type": "{x: number, z: number}",
+              "optional": false,
+              "description": "Pointer position on the table plane."
+            },
+            {
+              "name": "previous",
+              "type": "number",
+              "optional": false,
+              "description": "Angle to keep when the pointer sits on the cue ball."
+            }
+          ],
+          "returns": {
+            "type": "number",
+            "description": "Angle in radians from the cue ball to the pointer."
+          },
+          "throws": [],
+          "edge": [
+            "A pointer within 1e-6 of the cue ball returns previous unchanged."
+          ],
+          "examples": [
+            "aimAngle({x: 0, z: 0}, {x: -1, z: 0}, 1) // => Math.PI",
+            "aimAngle({x: 0, z: 0}, {x: 0, z: 0}, 1) // => 1"
+          ],
+          "signature": "aimAngle(cue, point, previous)",
+          "paramNames": [
+            "cue",
+            "point",
+            "previous"
+          ]
+        },
+        {
+          "name": "dragAngle",
+          "description": "Aim while dragging the cue butt itself: the butt follows the pointer, so the shot goes the opposite way.",
+          "params": [
+            {
+              "name": "cue",
+              "type": "{x: number, z: number}",
+              "optional": false,
+              "description": "Cue ball centre."
+            },
+            {
+              "name": "point",
+              "type": "{x: number, z: number}",
+              "optional": false,
+              "description": "Pointer position (the cue butt)."
+            },
+            {
+              "name": "previous",
+              "type": "number",
+              "optional": false,
+              "description": "Angle to keep when the pointer sits on the cue ball."
+            }
+          ],
+          "returns": {
+            "type": "number",
+            "description": "Shot angle in radians, pointing from the pointer through the cue ball."
+          },
+          "throws": [],
+          "edge": [
+            "A pointer within 1e-6 of the cue ball returns previous unchanged."
+          ],
+          "examples": [
+            "dragAngle({x: 0, z: 0}, {x: -1, z: 0}, 1) // => 0",
+            "dragAngle({x: 0, z: 0}, {x: 0, z: 0}, 1) // => 1"
+          ],
+          "signature": "dragAngle(cue, point, previous)",
+          "paramNames": [
+            "cue",
+            "point",
+            "previous"
+          ]
+        }
+      ],
+      "constants": [],
+      "dependencies": [],
+      "external": [],
+      "source": "// Aim angles for a cue ball on a table plane (x along the table, z across; angles in radians, atan2 convention).\n// Version: 1.0.0\n// Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).\n// License: Apache-2.0\n\n/**\n * Aim from the cue ball toward the pointer (dragging on the felt).\n * @param {{x: number, z: number}} cue - Cue ball centre.\n * @param {{x: number, z: number}} point - Pointer position on the table plane.\n * @param {number} previous - Angle to keep when the pointer sits on the cue ball.\n * @returns {number} Angle in radians from the cue ball to the pointer.\n * @edge A pointer within 1e-6 of the cue ball returns previous unchanged.\n * @example aimAngle({x: 0, z: 0}, {x: -1, z: 0}, 1) // => Math.PI\n * @example aimAngle({x: 0, z: 0}, {x: 0, z: 0}, 1) // => 1\n */\nexport function aimAngle(cue, point, previous) {\n  return Math.hypot(point.x - cue.x, point.z - cue.z) > 1e-6 ? Math.atan2(point.z - cue.z, point.x - cue.x) : previous;\n}\n\n/**\n * Aim while dragging the cue butt itself: the butt follows the pointer, so the shot goes the opposite way.\n * @param {{x: number, z: number}} cue - Cue ball centre.\n * @param {{x: number, z: number}} point - Pointer position (the cue butt).\n * @param {number} previous - Angle to keep when the pointer sits on the cue ball.\n * @returns {number} Shot angle in radians, pointing from the pointer through the cue ball.\n * @edge A pointer within 1e-6 of the cue ball returns previous unchanged.\n * @example dragAngle({x: 0, z: 0}, {x: -1, z: 0}, 1) // => 0\n * @example dragAngle({x: 0, z: 0}, {x: 0, z: 0}, 1) // => 1\n */\nexport function dragAngle(cue, point, previous) {\n  return Math.hypot(cue.x - point.x, cue.z - point.z) > 1e-6 ? Math.atan2(cue.z - point.z, cue.x - point.x) : previous;\n}\n",
+      "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { aimAngle, dragAngle } from \"./aim.js\";\n\ntest(\"aim points from the cue ball toward the pointer and keeps the angle at zero length\", () => {\n  assert.equal(aimAngle({ x: 0, z: 0 }, { x: -1, z: 0 }, 1), Math.PI);\n  assert.equal(aimAngle({ x: 0, z: 0 }, { x: 0, z: 1 }, 1), Math.PI / 2);\n  assert.equal(aimAngle({ x: 0, z: 0 }, { x: 0, z: 0 }, 1), 1);\n});\ntest(\"dragging the cue butt aims away from the pointer\", () => {\n  assert.equal(dragAngle({ x: 0, z: 0 }, { x: -1, z: 0 }, 1), 0);\n  assert.equal(dragAngle({ x: 0, z: 0 }, { x: 0, z: -1 }, 1), Math.PI / 2);\n  assert.equal(dragAngle({ x: 0, z: 0 }, { x: 0, z: 0 }, 1), 1);\n});\n"
+    },
+    {
+      "id": "interaction/cue-hit",
+      "category": "interaction",
+      "path": "modules/interaction/cue-hit.js",
+      "testPath": "modules/interaction/cue-hit.test.js",
+      "summary": "Hit test for grabbing a cue shaft that lies behind the cue ball (x along the table, z across; metres).",
+      "version": "1.0.0",
+      "provenance": "Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).",
+      "license": "Apache-2.0",
+      "status": "stable",
+      "hash": "976e6eec2a74",
+      "notes": "",
+      "exports": [
+        "CUE",
+        "hitsCue"
+      ],
+      "examples": [],
+      "functions": [
+        {
+          "name": "hitsCue",
+          "description": "True when a point lies on the visible cue shaft behind the cue ball.",
+          "params": [
+            {
+              "name": "cue",
+              "type": "{x: number, z: number}",
+              "optional": false,
+              "description": "Cue ball centre."
+            },
+            {
+              "name": "angle",
+              "type": "number",
+              "optional": false,
+              "description": "Shot angle in radians; the shaft extends opposite to it."
+            },
+            {
+              "name": "point",
+              "type": "{x: number, z: number}",
+              "optional": false,
+              "description": "Point to test (pointer on the table plane)."
+            },
+            {
+              "name": "radius",
+              "type": "number",
+              "optional": false,
+              "description": "Cue ball radius; the shaft starts one radius behind the centre."
+            },
+            {
+              "name": "pullOffset",
+              "type": "number",
+              "optional": true,
+              "description": "How far the cue is currently pulled back."
+            },
+            {
+              "name": "grab",
+              "type": "number",
+              "optional": true,
+              "description": "Tolerance around the shaft."
+            }
+          ],
+          "returns": {
+            "type": "boolean",
+            "description": "Whether the point can grab the cue."
+          },
+          "throws": [],
+          "edge": [
+            "Points in front of the ball, beyond the shaft length, or farther than grab from its line return false."
+          ],
+          "examples": [
+            "hitsCue({x: 0, z: 0}, 0, {x: -0.5, z: 0}, 0.02857) // => true",
+            "hitsCue({x: 0, z: 0}, 0, {x: 0.5, z: 0}, 0.02857) // => false"
+          ],
+          "signature": "hitsCue(cue, angle, point, radius, pullOffset = 0, grab = CUE.grabRadius)",
+          "paramNames": [
+            "cue",
+            "angle",
+            "point",
+            "radius",
+            "pullOffset",
+            "grab"
+          ]
+        }
+      ],
+      "constants": [
+        {
+          "name": "CUE",
+          "description": " Cue geometry in metres: shaft length 1.47 and the grab radius around the shaft (0.05). ",
+          "params": [],
+          "returns": null,
+          "throws": [],
+          "edge": [],
+          "examples": []
+        }
+      ],
+      "dependencies": [],
+      "external": [],
+      "source": "// Hit test for grabbing a cue shaft that lies behind the cue ball (x along the table, z across; metres).\n// Version: 1.0.0\n// Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).\n// License: Apache-2.0\n\n/** Cue geometry in metres: shaft length 1.47 and the grab radius around the shaft (0.05). */\nexport const CUE = Object.freeze({ length: 1.47, grabRadius: 0.05 });\n\n/**\n * True when a point lies on the visible cue shaft behind the cue ball.\n * @param {{x: number, z: number}} cue - Cue ball centre.\n * @param {number} angle - Shot angle in radians; the shaft extends opposite to it.\n * @param {{x: number, z: number}} point - Point to test (pointer on the table plane).\n * @param {number} radius - Cue ball radius; the shaft starts one radius behind the centre.\n * @param {number} [pullOffset=0] - How far the cue is currently pulled back.\n * @param {number} [grab=0.05] - Tolerance around the shaft.\n * @returns {boolean} Whether the point can grab the cue.\n * @edge Points in front of the ball, beyond the shaft length, or farther than grab from its line return false.\n * @example hitsCue({x: 0, z: 0}, 0, {x: -0.5, z: 0}, 0.02857) // => true\n * @example hitsCue({x: 0, z: 0}, 0, {x: 0.5, z: 0}, 0.02857) // => false\n */\nexport function hitsCue(cue, angle, point, radius, pullOffset = 0, grab = CUE.grabRadius) {\n  const dx = Math.cos(angle), dz = Math.sin(angle), start = radius + pullOffset;\n  const along = -((point.x - cue.x) * dx + (point.z - cue.z) * dz);\n  const across = Math.abs((point.x - cue.x) * -dz + (point.z - cue.z) * dx);\n  return along >= start - grab && along <= start + CUE.length && across <= grab;\n}\n",
+      "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { hitsCue } from \"./cue-hit.js\";\n\ntest(\"cue hit test covers the shaft behind the ball only\", () => {\n  const c = { x: 0, z: 0 }, r = 0.02857;\n  assert.ok(hitsCue(c, 0, { x: -0.5, z: 0 }, r));\n  assert.ok(hitsCue(c, 0, { x: -1.2, z: 0.03 }, r));\n  assert.ok(!hitsCue(c, 0, { x: 0.5, z: 0 }, r));\n  assert.ok(!hitsCue(c, 0, { x: -0.5, z: 0.2 }, r));\n  assert.ok(!hitsCue(c, 0, { x: -2, z: 0 }, r));\n});\ntest(\"a pulled-back cue moves the grab window with it\", () => {\n  const c = { x: 0, z: 0 }, r = 0.02857;\n  assert.ok(!hitsCue(c, 0, { x: -0.04, z: 0 }, r, 0.12));\n  assert.ok(hitsCue(c, 0, { x: -0.2, z: 0 }, r, 0.12));\n});\n"
+    },
+    {
       "id": "interaction/pull-gesture",
       "category": "interaction",
       "path": "modules/interaction/pull-gesture.js",
       "testPath": "modules/interaction/pull-gesture.test.js",
       "summary": "Pull-to-shoot gesture math. Pure functions: no DOM, no globals.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "provenance": "Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).",
       "license": "Apache-2.0",
       "status": "stable",
-      "hash": "b2083cfbb625",
+      "hash": "e9311c9e8670",
       "notes": "Units: pointer positions and distance share one unit (pixels); ratios are 0..1.",
       "exports": [
         "PULL",
@@ -96,7 +303,7 @@
         },
         {
           "name": "reachesMinPull",
-          "description": "True when a released pull is long enough to shoot. Tolerates 1e-9 of float noise: an exact 5% pull computed from pixel coordinates can land at 0.04999999.",
+          "description": "True when a released pull is long enough to shoot. Tolerates 1e-6 of representation error: browsers report pointer coordinates as float32 (e.g. 332.04998779296875), so an intended exact 5% pull can compute to 0.04999997 and must still shoot.",
           "params": [
             {
               "name": "ratio",
@@ -117,11 +324,12 @@
           },
           "throws": [],
           "edge": [
-            "Exactly the minimum shoots; anything clearly below does not."
+            "Exactly the minimum shoots; anything clearly below (for example 0.049) does not."
           ],
           "examples": [
             "reachesMinPull(0.05) // => true",
-            "reachesMinPull(0.049) // => false"
+            "reachesMinPull(0.049) // => false",
+            "reachesMinPull(0.04999997) // => true"
           ],
           "signature": "reachesMinPull(ratio, min = PULL.min)",
           "paramNames": [
@@ -145,8 +353,8 @@
         "math/clamp"
       ],
       "external": [],
-      "source": "// Pull-to-shoot gesture math. Pure functions: no DOM, no globals.\n// Units: pointer positions and distance share one unit (pixels); ratios are 0..1.\n// Version: 1.0.0\n// Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).\n// License: Apache-2.0\n\nimport { clamp } from \"../math/clamp.js\";\n\n/** Gesture thresholds: minimum pull ratio to shoot (0.05) and the power-curve exponent (1.5). */\nexport const PULL = Object.freeze({ min: 0.05, curve: 1.5 });\n\n/**\n * How far a drag has travelled along a track, clamped to 0..1.\n * @param {number} start - Pointer position where the drag began.\n * @param {number} current - Current pointer position.\n * @param {number} distance - Track length in the same unit as the positions.\n * @returns {number} Pull ratio in 0..1.\n * @edge A track length of 0 or less returns 0.\n * @edge Dragging backwards (current < start) returns 0.\n * @example pullRatio(100, 150, 100) // => 0.5\n * @example pullRatio(100, 50, 100) // => 0\n */\nexport const pullRatio = (start, current, distance) =>\n  distance > 0 ? clamp((current - start) / distance, 0, 1) : 0;\n\n/**\n * Power curve: gentle pulls stay gentle, full pulls reach 1.\n * @param {number} ratio - Pull ratio; values outside 0..1 are clamped.\n * @returns {number} Shot strength in 0..1.\n * @example shotStrength(1) // => 1\n * @example shotStrength(0) // => 0\n */\nexport const shotStrength = (ratio) => clamp(ratio, 0, 1) ** PULL.curve;\n\n/**\n * True when a released pull is long enough to shoot. Tolerates 1e-9 of float noise:\n * an exact 5% pull computed from pixel coordinates can land at 0.04999999.\n * @param {number} ratio - Pull ratio at release.\n * @param {number} [min=0.05] - Minimum ratio that still shoots.\n * @returns {boolean} Whether the pull reaches the minimum.\n * @edge Exactly the minimum shoots; anything clearly below does not.\n * @example reachesMinPull(0.05) // => true\n * @example reachesMinPull(0.049) // => false\n */\nexport const reachesMinPull = (ratio, min = PULL.min) => ratio >= min - 1e-9;\n",
-      "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { pullRatio, shotStrength, reachesMinPull } from \"./pull-gesture.js\";\n\ntest(\"pullRatio clamps to 0..1 and handles a zero-length track\", () => {\n  assert.equal(pullRatio(100, 150, 100), 0.5);\n  assert.equal(pullRatio(100, 50, 100), 0);\n  assert.equal(pullRatio(100, 900, 100), 1);\n  assert.equal(pullRatio(100, 150, 0), 0);\n});\ntest(\"shotStrength is monotonic and reaches 1\", () => {\n  assert.equal(shotStrength(0), 0);\n  assert.equal(shotStrength(1), 1);\n  assert.ok(shotStrength(0.5) < 0.5);\n});\ntest(\"reachesMinPull accepts exact 5% despite float noise, rejects less\", () => {\n  assert.equal(reachesMinPull(0.05), true);\n  assert.equal(reachesMinPull(0.05 - 1e-12), true);\n  assert.equal(reachesMinPull(0.049), false);\n  assert.equal(reachesMinPull(0), false);\n  for (let d = 100; d < 600; d++) assert.equal(reachesMinPull(((123.5 + d * 0.05) - 123.5) / d), true);\n});\n"
+      "source": "// Pull-to-shoot gesture math. Pure functions: no DOM, no globals.\n// Units: pointer positions and distance share one unit (pixels); ratios are 0..1.\n// Version: 1.1.0\n// Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).\n// License: Apache-2.0\n\nimport { clamp } from \"../math/clamp.js\";\n\n/** Gesture thresholds: minimum pull ratio to shoot (0.05) and the power-curve exponent (1.5). */\nexport const PULL = Object.freeze({ min: 0.05, curve: 1.5 });\n\n/**\n * How far a drag has travelled along a track, clamped to 0..1.\n * @param {number} start - Pointer position where the drag began.\n * @param {number} current - Current pointer position.\n * @param {number} distance - Track length in the same unit as the positions.\n * @returns {number} Pull ratio in 0..1.\n * @edge A track length of 0 or less returns 0.\n * @edge Dragging backwards (current < start) returns 0.\n * @example pullRatio(100, 150, 100) // => 0.5\n * @example pullRatio(100, 50, 100) // => 0\n */\nexport const pullRatio = (start, current, distance) =>\n  distance > 0 ? clamp((current - start) / distance, 0, 1) : 0;\n\n/**\n * Power curve: gentle pulls stay gentle, full pulls reach 1.\n * @param {number} ratio - Pull ratio; values outside 0..1 are clamped.\n * @returns {number} Shot strength in 0..1.\n * @example shotStrength(1) // => 1\n * @example shotStrength(0) // => 0\n */\nexport const shotStrength = (ratio) => clamp(ratio, 0, 1) ** PULL.curve;\n\n/**\n * True when a released pull is long enough to shoot. Tolerates 1e-6 of representation error:\n * browsers report pointer coordinates as float32 (e.g. 332.04998779296875), so an intended exact 5%\n * pull can compute to 0.04999997 and must still shoot.\n * @param {number} ratio - Pull ratio at release.\n * @param {number} [min=0.05] - Minimum ratio that still shoots.\n * @returns {boolean} Whether the pull reaches the minimum.\n * @edge Exactly the minimum shoots; anything clearly below (for example 0.049) does not.\n * @example reachesMinPull(0.05) // => true\n * @example reachesMinPull(0.049) // => false\n * @example reachesMinPull(0.04999997) // => true\n */\nexport const reachesMinPull = (ratio, min = PULL.min) => ratio >= min - 1e-6;\n",
+      "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { pullRatio, shotStrength, reachesMinPull } from \"./pull-gesture.js\";\n\ntest(\"pullRatio clamps to 0..1 and handles a zero-length track\", () => {\n  assert.equal(pullRatio(100, 150, 100), 0.5);\n  assert.equal(pullRatio(100, 50, 100), 0);\n  assert.equal(pullRatio(100, 900, 100), 1);\n  assert.equal(pullRatio(100, 150, 0), 0);\n});\ntest(\"shotStrength is monotonic and reaches 1\", () => {\n  assert.equal(shotStrength(0), 0);\n  assert.equal(shotStrength(1), 1);\n  assert.ok(shotStrength(0.5) < 0.5);\n});\ntest(\"reachesMinPull accepts an exact 5% despite float32 pointer coordinates, rejects weak pulls\", () => {\n  assert.equal(reachesMinPull(0.05), true);\n  // Real pointer data that broke the game's CI: float32 coordinate, 381px track.\n  const actual = pullRatio(313, 332.04998779296875, 381);\n  assert.ok(actual < 0.05);\n  assert.equal(reachesMinPull(actual), true);\n  assert.equal(reachesMinPull(0.049), false);\n  assert.equal(reachesMinPull(0.04), false);\n  assert.equal(reachesMinPull(0), false);\n});\n"
     },
     {
       "id": "math/clamp",
@@ -215,6 +423,74 @@
       "external": [],
       "source": "// Clamp a number into the range min..max.\n// Version: 1.0.0\n// Source: written for js-logic-library.\n// License: Apache-2.0\n\n/**\n * Limit a number to the inclusive range min..max.\n * @param {number} value - The input value.\n * @param {number} min - Lower bound (inclusive).\n * @param {number} max - Upper bound (inclusive); expected min <= max.\n * @returns {number} value limited to min..max.\n * @edge If value < min, returns min.\n * @edge If value > max, returns max.\n * @edge NaN in gives NaN out; arguments are not validated.\n * @example clamp(1.5, 0, 1) // => 1\n * @example clamp(0.25, 0, 1) // => 0.25\n */\nexport const clamp = (value, min, max) => Math.min(max, Math.max(min, value));\n",
       "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { clamp } from \"./clamp.js\";\n\ntest(\"clamp limits to the range and keeps in-range values\", () => {\n  assert.equal(clamp(1.5, 0, 1), 1);\n  assert.equal(clamp(-2, 0, 1), 0);\n  assert.equal(clamp(0.25, 0, 1), 0.25);\n  assert.equal(clamp(0, 0, 1), 0);\n  assert.equal(clamp(1, 0, 1), 1);\n});\n"
+    },
+    {
+      "id": "physics/post-contact",
+      "category": "physics",
+      "path": "modules/physics/post-contact.js",
+      "testPath": "modules/physics/post-contact.test.js",
+      "summary": "First-contact aftermath estimate for equal-mass balls (plane coordinates: x, z).",
+      "version": "1.0.0",
+      "provenance": "Blender-3D-Gallery Eight-Ball game (src/game/presentation.js).",
+      "license": "Apache-2.0",
+      "status": "stable",
+      "hash": "5f6591451e39",
+      "notes": "Frictionless model: ignores spin, friction and any later collision, so it is a guide, not a simulation.",
+      "exports": [
+        "postContact"
+      ],
+      "examples": [],
+      "functions": [
+        {
+          "name": "postContact",
+          "description": "Directions the object ball and the cue ball leave in after the cue ball first touches a ball.",
+          "params": [
+            {
+              "name": "balls",
+              "type": "Array<{id: number, x: number, z: number}>",
+              "optional": false,
+              "description": "Ball positions."
+            },
+            {
+              "name": "angle",
+              "type": "number",
+              "optional": false,
+              "description": "Shot angle of the cue ball in radians."
+            },
+            {
+              "name": "contact",
+              "type": "{kind: string, id?: number, x: number, z: number}",
+              "optional": false,
+              "description": "First contact; x, z is the cue ball centre at contact."
+            }
+          ],
+          "returns": {
+            "type": "Object|null",
+            "description": "{ object: {x, z, scale}, cue: {x, z, scale} | null }: unit directions with a 0..1 scale (share of the shot's speed); null when there is no ball contact."
+          },
+          "throws": [],
+          "edge": [
+            "A contact that is not a ball (cushion, pocket) returns null.",
+            "A head-on hit leaves the cue ball with no tangent: cue is null.",
+            "An unknown ball id, or a contact centred on the ball, returns null."
+          ],
+          "examples": [
+            "postContact([{id: 0, x: 0, z: 0}, {id: 3, x: 1, z: 0}], 0, {kind: \"ball\", id: 3, x: 0.9429, z: 0}) // => {object: {x: 1, z: 0, scale: 1}, cue: null}",
+            "postContact([{id: 0, x: 0, z: 0}], 0, {kind: \"cushion\", x: 1, z: 0}) // => null"
+          ],
+          "signature": "postContact(balls, angle, contact)",
+          "paramNames": [
+            "balls",
+            "angle",
+            "contact"
+          ]
+        }
+      ],
+      "constants": [],
+      "dependencies": [],
+      "external": [],
+      "source": "// First-contact aftermath estimate for equal-mass balls (plane coordinates: x, z).\n// Frictionless model: ignores spin, friction and any later collision, so it is a guide, not a simulation.\n// Version: 1.0.0\n// Source: Blender-3D-Gallery Eight-Ball game (src/game/presentation.js).\n// License: Apache-2.0\n\n/**\n * Directions the object ball and the cue ball leave in after the cue ball first touches a ball.\n * @param {Array<{id: number, x: number, z: number}>} balls - Ball positions.\n * @param {number} angle - Shot angle of the cue ball in radians.\n * @param {{kind: string, id?: number, x: number, z: number}} contact - First contact; x, z is the cue ball centre at contact.\n * @returns {Object|null} { object: {x, z, scale}, cue: {x, z, scale} | null }: unit directions with a 0..1 scale (share of the shot's speed); null when there is no ball contact.\n * @edge A contact that is not a ball (cushion, pocket) returns null.\n * @edge A head-on hit leaves the cue ball with no tangent: cue is null.\n * @edge An unknown ball id, or a contact centred on the ball, returns null.\n * @example postContact([{id: 0, x: 0, z: 0}, {id: 3, x: 1, z: 0}], 0, {kind: \"ball\", id: 3, x: 0.9429, z: 0}) // => {object: {x: 1, z: 0, scale: 1}, cue: null}\n * @example postContact([{id: 0, x: 0, z: 0}], 0, {kind: \"cushion\", x: 1, z: 0}) // => null\n */\nexport function postContact(balls, angle, contact) {\n  if (contact.kind !== \"ball\") return null;\n  const target = balls.find((b) => b.id === contact.id);\n  if (!target) return null;\n  const dx = Math.cos(angle), dz = Math.sin(angle), nx = target.x - contact.x, nz = target.z - contact.z;\n  const length = Math.hypot(nx, nz);\n  if (length < 1e-9) return null;\n  const ux = nx / length, uz = nz / length, dot = dx * ux + dz * uz;\n  const tx = dx - dot * ux, tz = dz - dot * uz, tangent = Math.hypot(tx, tz);\n  return {\n    object: { x: ux, z: uz, scale: Math.max(0, dot) },\n    cue: tangent > 1e-6 ? { x: tx / tangent, z: tz / tangent, scale: tangent } : null,\n  };\n}\n",
+      "test": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { postContact } from \"./post-contact.js\";\n\ntest(\"head-on sends the object ball straight and leaves no cue tangent\", () => {\n  const balls = [{ id: 0, x: 0, z: 0 }, { id: 3, x: 1, z: 0 }];\n  const r = postContact(balls, 0, { kind: \"ball\", id: 3, x: 1 - 0.0571, z: 0 });\n  assert.ok(Math.abs(r.object.x - 1) < 1e-9 && Math.abs(r.object.z) < 1e-9);\n  assert.equal(r.cue, null);\n  assert.equal(postContact(balls, 0, { kind: \"cushion\" }), null);\n});\ntest(\"cut shot splits object and cue directions at right angles\", () => {\n  const balls = [{ id: 0, x: 0, z: 0 }, { id: 3, x: 1, z: 0.03 }];\n  const r = postContact(balls, 0, { kind: \"ball\", id: 3, x: 0.95, z: 0 });\n  assert.ok(Math.abs(r.object.x * r.cue.x + r.object.z * r.cue.z) < 1e-9);\n  assert.ok(r.cue.scale > 0);\n});\ntest(\"unknown ball id returns null\", () => {\n  assert.equal(postContact([{ id: 0, x: 0, z: 0 }], 0, { kind: \"ball\", id: 9, x: 1, z: 0 }), null);\n});\n"
     }
   ]
 }

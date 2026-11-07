@@ -2,5 +2,8 @@
 Universal JavaScript logic: pure functions, one source, tests included. Copy a module with its dependencies and use it; do not redesign.
 Full source of every module: modules.json. Copy with dependencies: npm run copy -- <id> <dir>
 
-- interaction/pull-gesture v1.0.0: Pull-to-shoot gesture math. Pure functions: no DOM, no globals. | exports: PULL, pullRatio, shotStrength, reachesMinPull | deps: math/clamp | file: modules/interaction/pull-gesture.js
+- interaction/aim v1.0.0: Aim angles for a cue ball on a table plane (x along the table, z across; angles in radians, atan2 convention). | exports: aimAngle, dragAngle | deps: none | file: modules/interaction/aim.js
+- interaction/cue-hit v1.0.0: Hit test for grabbing a cue shaft that lies behind the cue ball (x along the table, z across; metres). | exports: CUE, hitsCue | deps: none | file: modules/interaction/cue-hit.js
+- interaction/pull-gesture v1.1.0: Pull-to-shoot gesture math. Pure functions: no DOM, no globals. | exports: PULL, pullRatio, shotStrength, reachesMinPull | deps: math/clamp | file: modules/interaction/pull-gesture.js
 - math/clamp v1.0.0: Clamp a number into the range min..max. | exports: clamp | deps: none | file: modules/math/clamp.js
+- physics/post-contact v1.0.0: First-contact aftermath estimate for equal-mass balls (plane coordinates: x, z). | exports: postContact | deps: none | file: modules/physics/post-contact.js

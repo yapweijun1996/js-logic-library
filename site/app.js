@@ -154,7 +154,7 @@ function parseArg(p, raw) {
   try { return JSON.parse(raw); } catch { throw new Error(`${p.name} must be valid JSON`); }
 }
 function defaultsFor(f) {
-  try { const call = f.examples[0].split(" // => ")[0]; return new Function(`const ${f.name}=(...a)=>a;return ${call};`)().map(String); }
+  try { const call = f.examples[0].split(" // => ")[0]; return new Function(`const ${f.name}=(...a)=>a;return ${call};`)().map((v) => (v !== null && typeof v === "object" ? JSON.stringify(v) : String(v))); }
   catch { return []; }
 }
 function playgroundTab(m) {

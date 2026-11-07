@@ -4,5 +4,8 @@
 
 | Module | Version | Purpose | Exports | Depends on | Source | License |
 | --- | --- | --- | --- | --- | --- | --- |
-| `modules/interaction/pull-gesture.js` | 1.0.0 | Pull-to-shoot gesture math. Pure functions: no DOM, no globals. | `PULL`, `pullRatio`, `shotStrength`, `reachesMinPull` | math/clamp | Blender-3D-Gallery Eight-Ball game (src/game/interaction.js). | Apache-2.0 |
+| `modules/interaction/aim.js` | 1.0.0 | Aim angles for a cue ball on a table plane (x along the table, z across; angles in radians, atan2 convention). | `aimAngle`, `dragAngle` | none | Blender-3D-Gallery Eight-Ball game (src/game/interaction.js). | Apache-2.0 |
+| `modules/interaction/cue-hit.js` | 1.0.0 | Hit test for grabbing a cue shaft that lies behind the cue ball (x along the table, z across; metres). | `CUE`, `hitsCue` | none | Blender-3D-Gallery Eight-Ball game (src/game/interaction.js). | Apache-2.0 |
+| `modules/interaction/pull-gesture.js` | 1.1.0 | Pull-to-shoot gesture math. Pure functions: no DOM, no globals. | `PULL`, `pullRatio`, `shotStrength`, `reachesMinPull` | math/clamp | Blender-3D-Gallery Eight-Ball game (src/game/interaction.js). | Apache-2.0 |
 | `modules/math/clamp.js` | 1.0.0 | Clamp a number into the range min..max. | `clamp` | none | written for js-logic-library. | Apache-2.0 |
+| `modules/physics/post-contact.js` | 1.0.0 | First-contact aftermath estimate for equal-mass balls (plane coordinates: x, z). | `postContact` | none | Blender-3D-Gallery Eight-Ball game (src/game/presentation.js). | Apache-2.0 |

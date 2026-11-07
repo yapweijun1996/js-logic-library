@@ -14,6 +14,20 @@ async function walk(dir) {
 }
 
 
+
+// Splits "@tag {type with {nested} braces} rest" into its parts.
+function splitType(line) {
+  const m = line.match(/^@(param|returns?|throws) \{/);
+  if (!m) return null;
+  let depth = 0, i = m[0].length - 1;
+  for (; i < line.length; i++) {
+    if (line[i] === "{") depth++;
+    else if (line[i] === "}" && --depth === 0) break;
+  }
+  if (depth !== 0) return null;
+  return { tag: m[1], type: line.slice(m[0].length, i), rest: line.slice(i + 2) };
+}
+
 // Parses the JSDoc block above each export into a machine-readable contract.
 function parseContract(source) {
   const lines = source.split("\n"), functions = [], constants = [];
@@ -31,9 +45,10 @@ function parseContract(source) {
     const entry = { name: (fn ?? konst)[1], description: "", params: [], returns: null, throws: [], edge: [], examples: [] };
     for (const l of text) {
       let m;
-      if ((m = l.match(/^@param \{([^}]+)\} (\[)?([\w.]+)(?:=[^\]]*)?\]? - (.*)$/))) entry.params.push({ name: m[3], type: m[1], optional: !!m[2], description: m[4] });
-      else if ((m = l.match(/^@returns? \{([^}]+)\} (.*)$/))) entry.returns = { type: m[1], description: m[2] };
-      else if ((m = l.match(/^@throws \{([^}]+)\} (.*)$/))) entry.throws.push({ type: m[1], description: m[2] });
+      const typed = splitType(l);
+      if (typed?.tag === "param" && (m = typed.rest.match(/^(\[)?([\w.]+)(?:=[^\]]*)?\]? - (.*)$/))) entry.params.push({ name: m[2], type: typed.type, optional: !!m[1], description: m[3] });
+      else if (typed && (typed.tag === "returns" || typed.tag === "return")) entry.returns = { type: typed.type, description: typed.rest };
+      else if (typed?.tag === "throws") entry.throws.push({ type: typed.type, description: typed.rest });
       else if ((m = l.match(/^@edge (.*)$/))) entry.edge.push(m[1]);
       else if ((m = l.match(/^@example (.*)$/))) entry.examples.push(m[1]);
       else if (!l.startsWith("@")) entry.description += (entry.description ? " " : "") + l;

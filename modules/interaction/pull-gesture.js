@@ -1,6 +1,6 @@
 // Pull-to-shoot gesture math. Pure functions: no DOM, no globals.
 // Units: pointer positions and distance share one unit (pixels); ratios are 0..1.
-// Version: 1.0.0
+// Version: 1.1.0
 // Source: Blender-3D-Gallery Eight-Ball game (src/game/interaction.js).
 // License: Apache-2.0
 
@@ -33,13 +33,15 @@ export const pullRatio = (start, current, distance) =>
 export const shotStrength = (ratio) => clamp(ratio, 0, 1) ** PULL.curve;
 
 /**
- * True when a released pull is long enough to shoot. Tolerates 1e-9 of float noise:
- * an exact 5% pull computed from pixel coordinates can land at 0.04999999.
+ * True when a released pull is long enough to shoot. Tolerates 1e-6 of representation error:
+ * browsers report pointer coordinates as float32 (e.g. 332.04998779296875), so an intended exact 5%
+ * pull can compute to 0.04999997 and must still shoot.
  * @param {number} ratio - Pull ratio at release.
  * @param {number} [min=0.05] - Minimum ratio that still shoots.
  * @returns {boolean} Whether the pull reaches the minimum.
- * @edge Exactly the minimum shoots; anything clearly below does not.
+ * @edge Exactly the minimum shoots; anything clearly below (for example 0.049) does not.
  * @example reachesMinPull(0.05) // => true
  * @example reachesMinPull(0.049) // => false
+ * @example reachesMinPull(0.04999997) // => true
  */
-export const reachesMinPull = (ratio, min = PULL.min) => ratio >= min - 1e-9;
+export const reachesMinPull = (ratio, min = PULL.min) => ratio >= min - 1e-6;
