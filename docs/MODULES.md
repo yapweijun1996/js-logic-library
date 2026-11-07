@@ -8,7 +8,7 @@ Copy one file from `src/` (and its test from `tests/`) into your project. Every 
 
 ## Rules for a new module
 1. Pure functions only; pass time, randomness and config in as arguments.
-2. Header comment states purpose, units and coordinate system.
+2. Header comment states purpose, `Input:`, `Output:`, units and coordinate system (the Input/Output contract).
 3. One test file per module that doubles as a usage example.
 4. Add one row to the table above.
 

@@ -1,5 +1,7 @@
 // Pull-to-shoot gesture math. Pure functions: no DOM, no globals, no dependencies.
 // Units: pointer positions and distance share one unit (pixels); ratios are 0..1.
+// Input: pointer start/current positions and track length (numbers); a ratio (number).
+// Output: pullRatio and shotStrength return 0..1; reachesMinPull returns a boolean.
 
 export const PULL = Object.freeze({ min: 0.05, curve: 1.5 });
 

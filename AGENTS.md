@@ -6,7 +6,7 @@ Read this first if you are an AI agent. Goal: reuse existing logic instead of re
 A library of small, pure, dependency-free JavaScript (ES modules) logic files. Each file in `src/` is designed to be copied alone into another project. There is no framework and no package to install.
 
 ## How to use it (do this, in order)
-1. Read `site/llms.txt` (one line per module: purpose, exports, dependencies, path). Full source of every module is in `site/modules.json`.
+1. Read `docs/MODULES.md` (human table) or `site/llms.txt` (one line per module: purpose, exports, dependencies, path). Full source of every module is in `site/modules.json`.
 2. Pick the module whose purpose matches your need. If one matches, use it as-is. Do not rewrite or "improve" it.
 3. Copy `src/<name>.js` and `tests/<name>.test.mjs` into the target project. Keep the header comment (it states units and coordinate systems).
 4. Run the copied test (`node --test`). It must pass in the new project before you build on it.
@@ -28,7 +28,7 @@ A library of small, pure, dependency-free JavaScript (ES modules) logic files. E
 ## Rules for a new module
 1. Pure functions: no DOM, no `window`, no `Date.now()` or randomness inside; pass time, config and randomness as arguments.
 2. No dependencies. Imports of sibling modules are allowed only if listed in the header.
-3. The first comment lines of the file are its documentation: line 1 is a one-line purpose; following lines state units, coordinate system and edge cases. The index builder reads these.
+3. The first comment lines of the file are its documentation and its Input/Output contract: line 1 is a one-line purpose; following lines state `Input:`, `Output:`, units, coordinate system and edge cases. The index builder reads these.
 4. Export named functions/constants only.
 5. Add `tests/<name>.test.mjs` covering normal cases and boundaries (zero, exact thresholds, float noise).
 6. Add one row to `docs/MODULES.md`, run `npm run build`, run `npm test`.
@@ -41,3 +41,6 @@ A library of small, pure, dependency-free JavaScript (ES modules) logic files. E
 
 ## Provenance
 `pull-gesture` came from the Blender-3D-Gallery Eight-Ball game (`src/game/interaction.js`). The 1e-9 tolerance in `reachesMinPull` exists because an exact 5% pull computed from pixel coordinates can land at 0.04999999 and wrongly cancel the shot.
+
+## Status of the design goals
+Discoverable, understandable (prose contract), reusable by copy and testable are in place. Not built yet: automatic copying of dependencies, per-module version or change detection, and verification outside Node. Do not claim these exist.
